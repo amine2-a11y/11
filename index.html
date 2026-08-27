@@ -145,46 +145,51 @@
     </script>
 
 <style>
-#stability-panel{position:fixed;left:12px;right:12px;bottom:12px;z-index:99999;max-width:980px;margin:auto;padding:14px 16px;border-radius:14px;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);box-shadow:0 8px 28px rgba(0,0,0,.35);color:#fff;font-family:system-ui,sans-serif;box-sizing:border-box}
-#stability-panel .sp-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
-#stability-panel .sp-title{font-weight:800;font-size:15px}.sp-sub{font-size:11px;opacity:.7}
-#stability-panel .sp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
-#stability-panel .sp-card{padding:8px 9px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:rgba(255,255,255,.05)}
-#stability-panel .sp-fw{font-weight:800;font-size:12px}.sp-pct{font-size:17px;font-weight:900;margin-top:3px}.sp-meta{font-size:9px;opacity:.65;margin-top:2px}
-#stability-panel .sp-hw{margin-top:9px;font-size:10px;opacity:.8}.sp-close{cursor:pointer;border:0;background:transparent;color:#fff;font-size:16px;opacity:.7}
-@media(max-width:650px){#stability-panel .sp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#real-device-stability{display:none;position:fixed;right:10px;bottom:10px;z-index:99999;padding:5px 9px;border-radius:7px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.14);color:#fff;font:10px/1.25 system-ui,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.25);pointer-events:none}
+#real-device-stability .rds-label{opacity:.78}#real-device-stability .rds-value{font-weight:800;margin-left:4px}
 </style>
-<div id="stability-panel" aria-live="polite">
-  <div class="sp-head"><div><div class="sp-title">نسبة الاستقرار — حسب Firmware وملف المعالج</div><div class="sp-sub">النسبة المعروضة هي نسبة نجاح فعلية مسجلة على هذا الجهاز، وليست رقمًا مخمّنًا.</div></div><button class="sp-close" id="sp-close" aria-label="إخفاء">×</button></div>
-  <div class="sp-grid" id="sp-grid"></div>
-  <div class="sp-hw" id="sp-hw">Hardware: جاري تحديد ملف PS4…</div>
-</div>
+<div id="real-device-stability"><span class="rds-label">استقرار الجهاز</span><span class="rds-value" id="real-device-stability-value">--%</span></div>
 <script>
 (function(){
 'use strict';
-var firmwareGroups=[['5.00–9.60','505_960'],['9.00','900'],['10.00–11.02','1000_1102'],['11.50–13.00','1150-1300']];
-function ua(){return navigator.userAgent||''}
-function hardwareProfile(){
-  var u=ua().toLowerCase();
-  /* WebKit's PS4 UA normally exposes firmware, not the CUH model. Do not pretend we can read CPU model. */
-  if(/playstation\s*4/.test(u)) return {name:'AMD Jaguar 8-core (PS4)',note:'موديل CUH/تردد CPU غير ظاهرين في WebKit؛ لا يتم تخمينهما'};
-  return {name:'غير معروف',note:'شغّل الصفحة على PS4 للحصول على سجل الجهاز'};
-}
+var box=document.getElementById('real-device-stability'), val=document.getElementById('real-device-stability-value');
 function firmware(){
- var u=ua(),m=u.match(/(?:PlayStation\s*4|PS4)[\s\/]+(\d+)\.(\d+)/i);
- return m?m[1]+'.'+m[2]:null;
+ var t=(document.body&&document.body.innerText)||'', x=t.match(/(?:PS4|PlayStation\s*4)[^0-9]*(\d+\.\d{2})/i);
+ return x?x[1]:'unknown';
 }
-function key(group){return 'rds-observed-'+group[0]+'-'+hardwareProfile().name}
-function stats(group){try{var x=JSON.parse(localStorage.getItem(key(group))||'null');if(x&&x.attempts>=0&&x.successes>=0)return x}catch(e){}return {attempts:0,successes:0}}
-function pct(x){return x.attempts>0?Math.round(x.successes*100/x.attempts)+'%':'--%'}
+var fw=firmware(), key='device-stability-'+fw;
+var samples=[], last=performance.now(), shown=false, active=false;
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+function sample(){
+ var now=performance.now(), gap=now-last-100; last=now;
+ if(gap>=0) samples.push(gap);
+ if(samples.length>30)samples.shift();
+}
+function score(){
+ if(samples.length<5)return null;
+ var sum=0, worst=0;
+ for(var i=0;i<samples.length;i++){sum+=samples[i];if(samples[i]>worst)worst=samples[i]}
+ var avg=sum/samples.length;
+ /* Browser-visible proxy only: event-loop stalls. PS4 WebKit does not expose CPU % directly. */
+ var s=100-(avg*1.15)-(worst*.22);
+ return Math.round(clamp(s,0,100));
+}
 function render(){
- var grid=document.getElementById('sp-grid'); grid.innerHTML='';
- firmwareGroups.forEach(function(g){var x=stats(g),d=document.createElement('div');d.className='sp-card';d.innerHTML='<div class="sp-fw">'+g[0]+'</div><div class="sp-pct">'+pct(x)+'</div><div class="sp-meta">نجاح '+x.successes+' / محاولات '+x.attempts+'</div>';grid.appendChild(d)});
- var h=hardwareProfile(); document.getElementById('sp-hw').textContent='Hardware: '+h.name+' — '+h.note;
+ var s=score();
+ if(s===null)return;
+ val.textContent=s+'%';
+ if(active)box.style.display='block';
+ try{localStorage.setItem(key,JSON.stringify({score:s,updated:Date.now()}))}catch(e){}
 }
-render();
-document.getElementById('sp-close').onclick=function(){document.getElementById('stability-panel').style.display='none'};
-window.addEventListener('storage',render);
+function activate(){active=true;render()}
+function successText(){
+ var t=((document.body&&document.body.innerText)||'').toLowerCase();
+ return /jailbreak complete|jailbreak completed|jailbreak success|achieved jailbreak|already jailbroken|goldhen.*(?:loaded|success)|payload.*(?:loaded|running|success)|kpatched/.test(t);
+}
+var old=window.jailbreakSuccess;
+window.jailbreakSuccess=function(){if(typeof old==='function'){try{old.apply(this,arguments)}catch(e){}}activate()};
+setInterval(function(){sample();if(successText())activate();render()},100);
 })();
 </script>
-</body></html>
+</body>
+</html>
