@@ -1,0 +1,30 @@
+CACHE MANIFEST
+# PS4Debug offline payload included
+
+# PSFree-Lapse 9.00 offline cache — reduced runtime set
+../unified-theme.css
+../background.png
+aio_patches.bin
+alert.mjs
+cache.html
+config.mjs
+goldhen.bin
+index.html
+kpatch/900.elf
+lapse.mjs
+module/chain.mjs
+module/constants.mjs
+module/int64.mjs
+module/mem.mjs
+module/memtools.mjs
+module/offset.mjs
+module/rw.mjs
+module/utils.mjs
+module/view.mjs
+psfree.mjs
+rop/900.mjs
+send.mjs
+
+ps4debug.bin
+NETWORK:
+*
