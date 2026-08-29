@@ -1,0 +1,32 @@
+CACHE MANIFEST
+# Full offline cache v20260829-2
+# All project runtime assets and PS4Debug payloads are cached
+
+CACHE:
+../background-music.js
+../background.png
+../music_background.mp3
+../theme.css
+../unified-theme.css
+includes/script.js
+includes/style.css
+index.html
+ps4debug.bin
+src/lapse.js
+src/loader.js
+src/main.js
+src/misc.js
+src/netctrl.js
+src/payload.bin
+src/ps4/constants.js
+src/ps4/kernel.js
+src/ps4/patches/1000.bin
+src/ps4/patches/1050.bin
+src/ps4/patches/1100.bin
+src/ps4/patches/1102.bin
+src/ps4/userland.js
+src/worker.js
+src/workers.js
+
+NETWORK:
+# No wildcard network fallback: use cached resources offline
