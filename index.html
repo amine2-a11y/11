@@ -57,14 +57,36 @@
             function targetForFirmware() {
                 const m = userAgent.match(/(?:PlayStation 4|PS4)[\s\/]+([\d.]+)/i);
                 if (!m || !m[1]) return null;
-                const firmware = parseFloat(m[1]);
-                if (Math.abs(firmware - 9.00) < 0.001) return '900/index.html';
-                if (firmware >= 5.00 && firmware <= 9.60) return '505_960/index.html';
-                if (firmware >= 10.00 && firmware <= 11.02) return '1000_1102/index.html';
-                // Only route to firmware keys that actually exist in 1150-1300/ps4_offsets.js.
-                // Unknown/intermediate versions must not be guessed into a nearby kernel profile.
-                if ([11.50, 12.00, 12.02, 12.50, 12.52, 13.00].some(function (v) { return Math.abs(firmware - v) < 0.001; })) return '1150-1300/index.html';
-                return null;
+                const firmware = m[1];
+
+                // Exact firmware routing only. Never send a console to a
+                // neighboring firmware profile. Each destination contains
+                // its own exploit chain and firmware-specific assets.
+                const exact = {
+                    // Dedicated PSFree-Lapse 9.00 profile.
+                    '9.00': '900/index.html',
+
+                    // 5.05 / 6.70-6.72 / 7.00-9.60 profile.
+                    '5.05': '505_960/index.html',
+                    '6.70': '505_960/index.html', '6.71': '505_960/index.html', '6.72': '505_960/index.html',
+                    '7.00': '505_960/index.html', '7.01': '505_960/index.html', '7.02': '505_960/index.html',
+                    '7.50': '505_960/index.html', '7.51': '505_960/index.html', '7.55': '505_960/index.html',
+                    '8.00': '505_960/index.html', '8.01': '505_960/index.html', '8.03': '505_960/index.html',
+                    '8.50': '505_960/index.html', '8.52': '505_960/index.html',
+                    '9.03': '505_960/index.html', '9.04': '505_960/index.html',
+                    '9.50': '505_960/index.html', '9.51': '505_960/index.html', '9.60': '505_960/index.html',
+
+                    // 10.00 / 11.00 / 11.02 profile.
+                    '10.00': '1000_1102/index.html',
+                    '11.00': '1000_1102/index.html', '11.02': '1000_1102/index.html',
+
+                    // Exact profiles present in ps4_offsets.js.
+                    '11.50': '1150-1300/index.html',
+                    '12.00': '1150-1300/index.html', '12.02': '1150-1300/index.html',
+                    '12.50': '1150-1300/index.html', '12.52': '1150-1300/index.html',
+                    '13.00': '1150-1300/index.html'
+                };
+                return Object.prototype.hasOwnProperty.call(exact, firmware) ? exact[firmware] : null;
             }
 
             function go() {
@@ -148,52 +170,6 @@
         })();
     </script>
 
-<style>
-#real-device-stability{display:none;position:fixed;right:10px;bottom:10px;z-index:99999;padding:5px 9px;border-radius:7px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.14);color:#fff;font:10px/1.25 system-ui,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.25);pointer-events:none}
-#real-device-stability .rds-label{opacity:.78}#real-device-stability .rds-value{font-weight:800;margin-left:4px}
-</style>
-<div id="real-device-stability"><span class="rds-label">استقرار الجهاز</span><span class="rds-value" id="real-device-stability-value">--%</span></div>
-<script>
-(function(){
-'use strict';
-var box=document.getElementById('real-device-stability'), val=document.getElementById('real-device-stability-value');
-function firmware(){
- var t=(document.body&&document.body.innerText)||'', x=t.match(/(?:PS4|PlayStation\s*4)[^0-9]*(\d+\.\d{2})/i);
- return x?x[1]:'unknown';
-}
-var fw=firmware(), key='device-stability-'+fw;
-var samples=[], last=performance.now(), shown=false, active=false;
-function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
-function sample(){
- var now=performance.now(), gap=now-last-100; last=now;
- if(gap>=0) samples.push(gap);
- if(samples.length>30)samples.shift();
-}
-function score(){
- if(samples.length<5)return null;
- var sum=0, worst=0;
- for(var i=0;i<samples.length;i++){sum+=samples[i];if(samples[i]>worst)worst=samples[i]}
- var avg=sum/samples.length;
- /* Browser-visible proxy only: event-loop stalls. PS4 WebKit does not expose CPU % directly. */
- var s=100-(avg*1.15)-(worst*.22);
- return Math.round(clamp(s,0,100));
-}
-function render(){
- var s=score();
- if(s===null)return;
- val.textContent=s+'%';
- if(active)box.style.display='block';
- try{localStorage.setItem(key,JSON.stringify({score:s,updated:Date.now()}))}catch(e){}
-}
-function activate(){active=true;render()}
-function successText(){
- var t=((document.body&&document.body.innerText)||'').toLowerCase();
- return /jailbreak complete|jailbreak completed|jailbreak success|achieved jailbreak|already jailbroken|goldhen.*(?:loaded|success)|payload.*(?:loaded|running|success)|kpatched/.test(t);
-}
-var old=window.jailbreakSuccess;
-window.jailbreakSuccess=function(){if(typeof old==='function'){try{old.apply(this,arguments)}catch(e){}}activate()};
-setInterval(function(){sample();if(successText())activate();render()},100);
-})();
-</script>
+
 </body>
 </html>
