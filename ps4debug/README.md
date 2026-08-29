@@ -1,0 +1,113 @@
+# ps4debug
+```
+                   _____     .___    ___.
+   ______  ______ /  |  |  __| _/____\_ |__  __ __  ____
+   \____ \/  ___//   |  |_/ __ |/ __ \| __ \|  |  \/ ___\
+   |  |_> >___ \/    ^   / /_/ \  ___/| \_\ \  |  / /_/  >
+   |   __/____  >____   |\____ |\___  >___  /____/\___  /
+   |__|       \/     |__|     \/    \/    \/     /_____/
+
+                   Coded by golden.
+                   Updated by Ctn & SiSTRo.
+           FW 13.00 support by MasterMaind.
+```
+
+This is a debugger for the PlayStation 4. Yes thats right! Look around and you will find some very useful tools online or on the PS4 Source Discord channel. Anything is possible, except kernel mode debugging, which I decided to leave out.
+
+Latest version: `v1.1.19`
+
+Please report any issues to the [GoldHEN Discord](https://discord.gg/pR5NTEVBGt).
+
+### Quickstart Guide
+I am going to try to give you a little rundown on how to use ps4debug....
+1. Download Debug Watch or another debugging tool, checkout the discord for downloads
+2. Load the latest version of `ps4debug_1300.bin` on the console (on the release page)
+3. I recommend just loading ps4debug and your choice of HEN
+4. Start your favorite game!
+5. Attach to the game (or userland process)
+6. Start messing around with your debugging tool, try to find a bug for me!
+7. Make l33t hacks.
+
+## Features
+
+- Everything you know and love about ps4debug including:
+  - Firmware supported: (*) means untested
+    - `5.05`, `5.07`,
+    - `6.71`, `6.72`,
+    - `7.00`, `7.01`, `7.02`, `7.50`, `7.51`, `7.55`,
+    - `8.00`, `8.01`, `8.03`, `8.50`, `8.52`,
+    - `9.00`, `9.03`, `9.04`, `9.50`, `9.51`, `9.60`,
+    - `10.00`, `10.01`, `10.50`, `10.51`, `10.70`, `10.71`,
+    - `11.00`, `11.02`, `11.50`, `11.52`,
+    - `12.00`, `12.02`, `12.50`, `12.52`,
+    - `13.00`
+  - Rest mode support.
+  - Console scanner.
+
+## Current status with tools
+
+### Reaper Studio - Debugger, Trainer creator.
+- Working.
+
+### MultiTrainer II - Cheat/Trainer Loader
+- Working
+
+### Original Reaper - Debugger, Trainer creater.
+- Working
+
+### PS4 Cheater - Memory scanner/viewer.
+- Working
+
+### Credits
+
+Coded by [golden](https://github.com/jogolden), updated by [ctn123](https://github.com/ctn123) & [SiSTRo](https://github.com/SiSTR0).
+
+`13.00` support added by **MasterMaind** — see [FW_13.00.md](FW_13.00.md)
+for the offsets and how they were derived, and `patch_1300.py` to reproduce the build.
+
+Special thanks to:
+- [Kameleon](https://github.com/kmeps4)
+
+Greeting to other devs: (alphabetical order)
+- [2much4u](https://github.com/2much4u)
+- [Al-Azif](https://github.com/Al-Azif)
+- [berkayylmao](https://github.com/berkayylmao)
+- [ChendoChap](https://github.com/ChendoChap)
+- [flat_z](https://github.com/flatz)
+- [idc](https://github.com/idc)
+- [kiwidoggie](https://github.com/kiwidoggie)
+- [qwertyoruiop](https://twitter.com/qwertyoruiopz)
+- [sleirsgoevy](https://github.com/sleirsgoevy)
+- [Specter](https://github.com/Cryptogenic)
+- [SocraticBliss](https://github.com/SocraticBliss)
+- [theflow0](https://github.com/TheOfficialFloW)
+- [Vortex](https://github.com/xvortex)
+- [zecoxao](https://twitter.com/notzecoxao)
+- [Znullptr](https://github.com/dmiller423)
+
+Greeting to QA/Testers: (alphabetical order)
+- [Big_Wadger](https://twitter.com/big_wadger)
+- [DrYenyen](https://github.com/DrYenyen)
+- [Echo Stretch](https://twitter.com/StretchEcho)
+- [Hejran7](https://www.youtube.com/@BabaAlloush)
+- [n0llpointer](https://github.com/n0llptr)
+- [Pharaoh2k](https://github.com/Pharaoh2k)
+
+### Changelog:
+- v1.1.16
+  - Added support for `9.00`, `9.60`, `10.00`, `10.01` and `11.00`
+  - Fixed attach/detach issue when game exits during a debug session.
+- v1.1.17
+  - Improved support for debugging multi-threaded processes.
+  - Improved allocations for cheats.
+  - General stability improvements.
+  - General performance improvements.
+  - Added support for 10.50, 10.51, 10.70 and 10.71
+  - Fixed loading with latest GoldHEN.
+  - Implemented hardware breakpoints.
+- v1.1.18
+  - Add support for more firmwares between `5.05` and `12.02`
+- v1.1.19
+  - Add support for `12.50` and `12.52`
+- v1.1.19 (13.00)
+  - Added support for `13.00` by MasterMaind
